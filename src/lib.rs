@@ -1,10 +1,13 @@
-use axum::{routing::get, Router};
+use axum::{routing::{get, post}, Router};
 use tokio::{net::TcpListener, signal};
 
 mod health_check;
+mod subscribe;
 
 pub async fn run(listener: TcpListener) {
-    let app = Router::new().route("/healthz", get(health_check::health_check));
+    let app = Router::new()
+        .route("/healthz", get(health_check::health_check))
+        .route("/subscriptions", post(subscribe::subscribe));
 
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
