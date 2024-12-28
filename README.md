@@ -1,5 +1,10 @@
 # Email Newsletter
-Zero2prod book
+Zero2prod [book](https://www.zero2prod.com/index.html)
+
+## Prerequisites
+1. Rust, of course
+2. Docker
+3. sqlx-cli (install by using cargo install sqlx-cli --no-default-features --features rustls,postgres)
 
 ## Debugging
 

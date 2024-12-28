@@ -24,7 +24,7 @@ docker run \
     --publish "${DB_PORT}":5432 \
     --detach \
     --name "${CONTAINER_NAME}" \
-    postgres -N 1000
+    postgres:alpine -N 1000
 
 until [ \
     "$(docker inspect -f "{{.State.Health.Status}}" ${CONTAINER_NAME})" == \
@@ -42,3 +42,7 @@ docker exec -it "${CONTAINER_NAME}" psql -U "${SUPERUSER}" -c "${CREATE_QUERY}"
 # Grant create db privileges to the app user
 GRANT_QUERY="ALTER USER ${APP_USER} CREATEDB;"
 docker exec -it "${CONTAINER_NAME}" psql -U "${SUPERUSER}" -c "${GRANT_QUERY}"
+
+DATABASE_URL=postgres://${APP_USER}:${APP_USER_PWD}@localhost:${DB_PORT}/${APP_DB_NAME}
+export DATABASE_URL
+sqlx database create
