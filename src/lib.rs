@@ -3,10 +3,8 @@ use tokio::{net::TcpListener, signal};
 
 mod health_check;
 
-pub async fn run() {
+pub async fn run(listener: TcpListener) {
     let app = Router::new().route("/healthz", get(health_check::health_check));
-
-    let listener = TcpListener::bind("0.0.0.0:8080").await.unwrap();
 
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())

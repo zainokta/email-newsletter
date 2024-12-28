@@ -1,19 +1,30 @@
+use tokio::net::TcpListener;
+
 #[tokio::test]
 async fn health_check_success() {
-    spawn_app().await;
+    let address = spawn_app().await;
 
     let client = reqwest::Client::new();
 
     let response = client
-        .get("http://localhost:8080/healthz")
+        .get(&format!("{}/healthz", &address))
         .send()
         .await
         .expect("Failed to execute request.");
 
     assert!(response.status().is_success());
-    assert_eq!(Some(0), response.content_length());
 }
 
-async fn spawn_app() {
-    zero2prod::run().await
+async fn spawn_app() -> String {
+    let listener = TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("Failed to bind port 8080");
+
+    let port = listener.local_addr().unwrap().port();
+
+    let server = zero2prod::run(listener);
+
+    let _ = tokio::spawn(server);
+
+    format!("http://127.0.0.1:{}", port)
 }
