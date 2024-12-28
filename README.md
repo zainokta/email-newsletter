@@ -55,3 +55,17 @@ Zero2prod book
 }
 ```
 4. Press F5 or in the debugging menu, run the `Debug executable "zero2prod"`
+
+Note:
+if using symlink from windows to linux, add these lines to each of the configs on the `launch.json` file
+```
+    "sourceMap": {
+        "<mountpoint>": "${workspaceFolder}"
+    }
+```
+for example:
+```
+    "sourceMap": {
+        "/mnt/d/Project/zero2prod": "${workspaceFolder}"
+    }
+```
