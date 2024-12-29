@@ -36,25 +36,6 @@ Zero2prod [book](https://www.zero2prod.com/index.html)
             "envFile": ".env",
             "args": [],
             "cwd": "${workspaceFolder}"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug unit tests in executable 'zero2prod'",
-            "cargo": {
-                "args": [
-                    "test",
-                    "--no-run",
-                    "--bin=zero2prod",
-                    "--package=zero2prod"
-                ],
-                "filter": {
-                    "name": "zero2prod",
-                    "kind": "bin"
-                }
-            },
-            "args": [],
-            "cwd": "${workspaceFolder}"
         }
     ]
 }

@@ -1,11 +1,13 @@
 use tokio::net::TcpListener;
-use zero2prod::run;
+use zero2prod::{configuration::get_configuration, run};
 
 #[tokio::main]
 async fn main() {
-    let listener = TcpListener::bind("127.0.0.1:8080")
+    let config = get_configuration().expect("Failed to read configuration file");
+
+    let listener = TcpListener::bind(format!("127.0.0.1:{}", config.application_port))
         .await
-        .expect("Failed to bind port 8080");
+        .unwrap_or_else(|_| panic!("Failed to bind port {}", config.application_port));
 
     run(listener).await;
 }

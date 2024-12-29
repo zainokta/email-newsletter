@@ -1,8 +1,12 @@
-use axum::{routing::{get, post}, Router};
+use axum::{
+    routing::{get, post},
+    Router,
+};
 use tokio::{net::TcpListener, signal};
 
-mod health_check;
-mod subscribe;
+pub mod configuration;
+pub mod health_check;
+pub mod subscribe;
 
 pub async fn run(listener: TcpListener) {
     let app = Router::new()
