@@ -4,7 +4,7 @@ use uuid::Uuid;
 use zero2prod::configuration::{get_configuration, DatabaseConfig};
 use zero2prod::startup::run;
 
-#[warn(dead_code)]
+#[allow(dead_code)]
 pub struct TestApp {
     pub address: String,
     pub pool: PgPool,
