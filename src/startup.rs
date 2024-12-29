@@ -5,16 +5,16 @@ use axum::{
 use sqlx::PgPool;
 use tokio::{net::TcpListener, signal};
 
-use crate::health_check::*;
+use crate::health_check::handler as health_check_handler;
 use crate::state::AppState;
-use crate::subscribe::*;
+use crate::subscribe::handler as subscribe_handler;
 
 pub async fn run(listener: TcpListener, connection: PgPool) {
     let shared_connection = AppState::new(connection).await;
 
     let app = Router::new()
-        .route("/healthz", get(health::health_check))
-        .route("/subscriptions", post(subscription::subscribe))
+        .route("/healthz", get(health_check_handler::health_check))
+        .route("/subscriptions", post(subscribe_handler::subscribe))
         .with_state(shared_connection.clone());
 
     axum::serve(listener, app.into_make_service())

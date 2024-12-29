@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-pub mod subscription;
+pub mod handler;
 
 #[derive(Deserialize)]
 pub struct Subscription {
