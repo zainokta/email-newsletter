@@ -1,27 +1,17 @@
 mod common;
 
 use common::spawn_app;
-use sqlx::{Connection, PgConnection};
-use zero2prod::configuration::get_configuration;
 
 #[tokio::test]
 async fn subscribe_returns_a_200_for_valid_form_data() {
-    let app = spawn_app().await;
-
-    let config = get_configuration().expect("Failed to read configuration.");
-
-    let connection_string = config.database.connection_string();
-
-    let mut connection = PgConnection::connect(&connection_string)
-        .await
-        .expect("Failed to connect to Postgres.");
+    let test_app = spawn_app().await;
 
     let client = reqwest::Client::new();
 
     let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
 
     let response = client
-        .post(&format!("{}/subscriptions", &app))
+        .post(&format!("{}/subscriptions", &test_app.address))
         .header("Content-Type", "application/x-www-form-urlencoded")
         .body(body)
         .send()
@@ -31,7 +21,7 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
     assert_eq!(200, response.status().as_u16());
 
     let saved = sqlx::query!("SELECT email, name FROM subscriptions",)
-        .fetch_one(&mut connection)
+        .fetch_one(&test_app.pool.to_owned())
         .await
         .expect("Failed to fetch saved subscription.");
 
@@ -41,7 +31,7 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
 
 #[tokio::test]
 async fn subscribe_returns_a_400_when_data_is_missing() {
-    let app = spawn_app().await;
+    let test_app = spawn_app().await;
 
     let client = reqwest::Client::new();
 
@@ -53,7 +43,7 @@ async fn subscribe_returns_a_400_when_data_is_missing() {
 
     for (invalid_body, error_message) in test_cases {
         let response = client
-            .post(&format!("{}/subscriptions", &app))
+            .post(&format!("{}/subscriptions", &test_app.address))
             .header("Content-Type", "application/x-www-form-urlencoded")
             .body(invalid_body)
             .send()
