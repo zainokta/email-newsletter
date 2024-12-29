@@ -13,7 +13,7 @@ pub async fn run(listener: TcpListener, connection: PgPool) {
     let shared_connection = AppState::new(connection).await;
 
     let app = Router::new()
-        .route("/healthz", get(health_check::health_check))
+        .route("/healthz", get(health::health_check))
         .route("/subscriptions", post(subscription::subscribe))
         .with_state(shared_connection.clone());
 
