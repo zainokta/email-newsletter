@@ -22,7 +22,7 @@ jobs:
     # Sets the name `Test` for the job, which is displayed in the GitHub UI
     name: Test
     # Containers must run in Linux based operating systems
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # Service containers to run alongside the `test` container job
     services:
       # Label used to access the service container
@@ -70,7 +70,9 @@ jobs:
           PGPASSWORD="password" psql -U "postgres" -h "localhost" -c "${GRANT_QUERY}"
 
       - name: Migrate database
-        run: SKIP_DOCKER=true ./scripts/init_db.sh
+        run: |
+          chmod +x scripts/init_db.sh
+          SKIP_DOCKER=true ./scripts/init_db.sh
 
       - name: Run tests
         run: cargo test
@@ -81,7 +83,7 @@ jobs:
   # `fmt` container job
   fmt:
     name: Rustfmt
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Install the Rust toolchain
@@ -94,7 +96,7 @@ jobs:
   # `clippy` container job
   clippy:
     name: Clippy
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       # This environment variable forces sqlx to use its offline mode,
       # which means that it will not attempt to connect to a database
@@ -115,7 +117,7 @@ jobs:
   # `coverage` container job
   coverage:
     name: Code coverage
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:14
