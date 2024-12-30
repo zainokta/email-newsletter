@@ -1,6 +1,7 @@
 mod common;
 
 use common::spawn_app;
+use reqwest::StatusCode;
 
 #[tokio::test]
 async fn subscribe_returns_a_200_for_valid_form_data() {
@@ -18,7 +19,7 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
         .await
         .expect("Failed to execute request.");
 
-    assert_eq!(200, response.status().as_u16());
+    assert_eq!(StatusCode::OK, response.status().as_u16());
 
     let saved = sqlx::query!("SELECT email, name FROM subscriptions",)
         .fetch_one(&test_app.pool.to_owned())
@@ -30,7 +31,7 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
 }
 
 #[tokio::test]
-async fn subscribe_returns_a_400_when_data_is_missing() {
+async fn subscribe_returns_a_422_when_data_is_missing() {
     let test_app = spawn_app().await;
 
     let client = reqwest::Client::new();
@@ -51,9 +52,9 @@ async fn subscribe_returns_a_400_when_data_is_missing() {
             .expect("Failed to execute request.");
 
         assert_eq!(
-            400,
+            StatusCode::UNPROCESSABLE_ENTITY,
             response.status().as_u16(),
-            "The API did not fail with 400 Bad Request when the payload was {}.",
+            "The API did not fail with 422 Bad Request when the payload was {}.",
             error_message
         );
     }

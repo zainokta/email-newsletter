@@ -2,8 +2,8 @@ use serde::Deserialize;
 
 pub mod handler;
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct Subscription {
-    name: Option<String>,
-    email: Option<String>,
+    name: String,
+    email: String,
 }

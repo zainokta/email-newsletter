@@ -35,7 +35,9 @@ tower-http = { version = "0.6.2", features = [
     "trace",
 ] }
 tracing = "0.1.41"
-tracing-subscriber = "0.3.19"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+tracing-bunyan-formatter = "0.3.10"
+secrecy = { version = "0.10.3", features = ["serde"] }
 
 [dev-dependencies]
 reqwest = "0.12.11"

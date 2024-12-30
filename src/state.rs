@@ -1,6 +1,6 @@
 use sqlx::PgPool;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct AppState {
     pub(crate) connection: PgPool,
 }
