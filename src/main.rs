@@ -2,6 +2,7 @@ use core::time;
 
 use sqlx::postgres::PgPoolOptions;
 use tokio::net::TcpListener;
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use zero2prod::configuration::get_configuration;
 use zero2prod::startup::run;
 
@@ -21,6 +22,10 @@ async fn main() {
     let listener = TcpListener::bind(format!("127.0.0.1:{}", config.application_port))
         .await
         .unwrap_or_else(|_| panic!("Failed to bind port {}", config.application_port));
+
+    tracing_subscriber::registry()
+        .with(tracing_subscriber::fmt::layer())
+        .init();
 
     run(listener, pool).await;
 }
