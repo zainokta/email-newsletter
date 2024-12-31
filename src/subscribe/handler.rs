@@ -4,6 +4,7 @@ use axum::{
     response::IntoResponse,
 };
 use chrono::Utc;
+use garde::Validate;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -22,6 +23,11 @@ pub async fn subscribe(
     State(state): State<AppState>,
     Form(subscription): Form<Subscription>,
 ) -> impl IntoResponse {
+    if let Err(e) = subscription.validate() {
+        tracing::error!("Failed to validate subscription: {:?}", e);
+        return StatusCode::BAD_REQUEST.into_response();
+    }
+
     match insert_subscriber(&state.connection, subscription).await {
         Ok(_) => StatusCode::OK.into_response(),
         Err(_) => StatusCode::INTERNAL_SERVER_ERROR.into_response(),

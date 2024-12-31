@@ -31,7 +31,7 @@ impl DatabaseConfig {
         PgConnectOptions::new()
             .host(&self.host)
             .username(&self.username)
-            .password(&self.password.expose_secret())
+            .password(self.password.expose_secret())
             .ssl_mode(ssl_mode)
             .database(&self.database_name)
     }
