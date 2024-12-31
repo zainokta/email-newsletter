@@ -1,6 +1,6 @@
 use std::sync::LazyLock;
 
-use secrecy::{ExposeSecret, SecretBox};
+use secrecy::SecretBox;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use tokio::net::TcpListener;
 use uuid::Uuid;
@@ -59,17 +59,16 @@ pub async fn configure_database(config: &DatabaseConfig) -> PgPool {
         ..config.clone()
     };
 
-    let mut connection =
-        PgConnection::connect(&maintenance_config.connection_string().expose_secret())
-            .await
-            .expect("Failed to connect to Postgres.");
+    let mut connection = PgConnection::connect_with(&maintenance_config.connect_options())
+        .await
+        .expect("Failed to connect to Postgres.");
 
     connection
         .execute(format!(r#"CREATE DATABASE "{}";"#, config.database_name).as_str())
         .await
         .expect("Failed to create database.");
 
-    let connection_pool = PgPool::connect(&config.connection_string().expose_secret())
+    let connection_pool = PgPool::connect_with(config.connect_options())
         .await
         .expect("Failed to connect to Postgres.");
 

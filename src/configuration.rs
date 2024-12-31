@@ -1,5 +1,7 @@
-use secrecy::{ExposeSecret, SecretBox, SecretString};
+use secrecy::{ExposeSecret, SecretString};
 use serde::Deserialize;
+use serde_aux::field_attributes::deserialize_number_from_string;
+use sqlx::postgres::{PgConnectOptions, PgSslMode};
 
 #[derive(Deserialize)]
 pub struct Config {
@@ -10,14 +12,34 @@ pub struct Config {
 #[derive(Deserialize, Clone)]
 pub struct DatabaseConfig {
     pub host: String,
+    #[serde(deserialize_with = "deserialize_number_from_string")]
     pub port: u16,
     pub username: String,
     pub password: SecretString,
     pub database_name: String,
+    pub require_ssl: bool,
+}
+
+impl DatabaseConfig {
+    pub fn connect_options(&self) -> PgConnectOptions {
+        let ssl_mode = if self.require_ssl {
+            PgSslMode::Require
+        } else {
+            PgSslMode::Prefer
+        };
+
+        PgConnectOptions::new()
+            .host(&self.host)
+            .username(&self.username)
+            .password(&self.password.expose_secret())
+            .ssl_mode(ssl_mode)
+            .database(&self.database_name)
+    }
 }
 
 #[derive(Deserialize, Clone)]
 pub struct ApplicationConfig {
+    #[serde(deserialize_with = "deserialize_number_from_string")]
     pub port: u16,
     pub host: String,
 }
@@ -41,22 +63,14 @@ pub fn get_configuration() -> Result<Config, config::ConfigError> {
         .add_source(config::File::from(
             configuration_directory.join(environment_filename),
         ))
+        .add_source(
+            config::Environment::with_prefix("APP")
+                .prefix_separator("_")
+                .separator("__"),
+        )
         .build()?;
 
     config.try_deserialize::<Config>()
-}
-
-impl DatabaseConfig {
-    pub fn connection_string(&self) -> SecretString {
-        SecretBox::from(format!(
-            "postgres://{}:{}@{}:{}/{}",
-            self.username,
-            self.password.expose_secret(),
-            self.host,
-            self.port,
-            self.database_name
-        ))
-    }
 }
 
 pub enum Environment {

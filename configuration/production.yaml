@@ -1,2 +1,5 @@
 application:
   host: 0.0.0.0
+database:
+  # change to require_ssl: true if needed
+  require_ssl: false
