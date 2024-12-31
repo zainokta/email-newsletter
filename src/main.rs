@@ -1,5 +1,6 @@
 use core::time;
 
+use secrecy::ExposeSecret;
 use sqlx::postgres::PgPoolOptions;
 use tokio::net::TcpListener;
 use zero2prod::configuration::get_configuration;
@@ -18,7 +19,7 @@ async fn main() {
         .min_connections(10)
         .idle_timeout(time::Duration::from_secs(30))
         .max_lifetime(time::Duration::from_secs(60))
-        .connect(&config.database.connection_string())
+        .connect(config.database.connection_string().expose_secret())
         .await
         .expect("Failed to connect to Postgres.");
 

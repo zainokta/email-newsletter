@@ -40,4 +40,4 @@ tracing-bunyan-formatter = "0.3.10"
 secrecy = { version = "0.10.3", features = ["serde"] }
 
 [dev-dependencies]
-reqwest = "0.12.11"
+reqwest = "0.12.12"
