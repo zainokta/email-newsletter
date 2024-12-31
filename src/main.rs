@@ -19,13 +19,15 @@ async fn main() {
         .min_connections(10)
         .idle_timeout(time::Duration::from_secs(30))
         .max_lifetime(time::Duration::from_secs(60))
-        .connect(config.database.connection_string().expose_secret())
-        .await
+        .connect_lazy(config.database.connection_string().expose_secret())
         .expect("Failed to connect to Postgres.");
 
-    let listener = TcpListener::bind(format!("127.0.0.1:{}", config.application_port))
-        .await
-        .unwrap_or_else(|_| panic!("Failed to bind port {}", config.application_port));
+    let listener = TcpListener::bind(format!(
+        "{}:{}",
+        config.application.host, config.application.port
+    ))
+    .await
+    .unwrap_or_else(|_| panic!("Failed to bind port {}", config.application.port));
 
     run(listener, pool).await;
 }
